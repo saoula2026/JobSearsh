@@ -1,0 +1,207 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════
+   Design Tokens — Violet Palette
+   Primary: hsl(262, 83%, 58%) — Violet
+   Rationale: distinct from blue-600 default, professional/ambitious feel
+═══════════════════════════════════════ */
+
+:root {
+  /* Backgrounds */
+  --bg-base:        #fafafa;
+  --bg-surface:     #ffffff;
+  --bg-raised:      #f5f3ff;
+  --bg-border:      #e8e4f0;
+
+  /* Violet accent scale */
+  --accent-50:      #f5f3ff;
+  --accent-100:     #ede9fe;
+  --accent-200:     #ddd6fe;
+  --accent-300:     #c4b5fd;
+  --accent-400:     #a78bfa;
+  --accent-500:     #8b5cf6;
+  --accent-600:     #7c3aed;
+  --accent-700:     #6d28d9;
+  --accent-800:     #5b21b6;
+  --accent-900:     #4c1d95;
+
+  /* Text */
+  --text-primary:   #0f0a1e;
+  --text-secondary: #4b4566;
+  --text-muted:     #6b6385;
+  --text-inverted:  #ffffff;
+
+  /* Status colors */
+  --success:        #059669;
+  --success-bg:     #ecfdf5;
+  --warning:        #d97706;
+  --warning-bg:     #fffbeb;
+  --danger:         #dc2626;
+  --danger-bg:      #fef2f2;
+  --info:           #0891b2;
+  --info-bg:        #ecfeff;
+
+  /* Shadows */
+  --shadow-sm:   0 1px 3px 0 rgba(76, 29, 149, 0.07);
+  --shadow-md:   0 4px 16px -2px rgba(76, 29, 149, 0.12), 0 2px 6px -2px rgba(76, 29, 149, 0.06);
+  --shadow-lg:   0 10px 32px -4px rgba(76, 29, 149, 0.16), 0 4px 12px -4px rgba(76, 29, 149, 0.08);
+  --shadow-glow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+
+  /* Radius */
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  16px;
+  --radius-xl:  24px;
+
+  /* Motion */
+  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth:  cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast:   150ms;
+  --duration-base:   220ms;
+  --duration-slow:   400ms;
+}
+
+/* Dark mode tokens */
+.dark, [data-theme="dark"] {
+  --bg-base:        #0d0a18;
+  --bg-surface:     #13102a;
+  --bg-raised:      #1a1630;
+  --bg-border:      #2d2650;
+
+  --text-primary:   #f0ecff;
+  --text-secondary: #c4bce0;
+  --text-muted:     #9b92b3;
+
+  --success-bg:     rgba(5, 150, 105, 0.15);
+  --warning-bg:     rgba(217, 119, 6, 0.15);
+  --danger-bg:      rgba(220, 38, 38, 0.15);
+  --info-bg:        rgba(8, 145, 178, 0.15);
+
+  --shadow-sm:   0 1px 3px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md:   0 4px 16px -2px rgba(0, 0, 0, 0.4), 0 2px 6px -2px rgba(0, 0, 0, 0.2);
+  --shadow-lg:   0 10px 32px -4px rgba(0, 0, 0, 0.5), 0 4px 12px -4px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 0 3px rgba(139, 92, 246, 0.35);
+}
+
+/* ═══════════════════════════════════════
+   Tailwind theme extension
+═══════════════════════════════════════ */
+@theme inline {
+  --color-background:   var(--bg-base);
+  --color-foreground:   var(--text-primary);
+  --font-sans:          var(--font-inter);
+  --font-display:       var(--font-jakarta);
+  --font-mono:          var(--font-geist-mono);
+}
+
+/* ═══════════════════════════════════════
+   Base styles
+═══════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+/* Focus visible — violet ring, not browser default */
+:focus-visible {
+  outline: 2px solid var(--accent-500);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ═══════════════════════════════════════
+   Shimmer animation (skeleton loaders)
+═══════════════════════════════════════ */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-border) 25%,
+    var(--bg-raised) 50%,
+    var(--bg-border) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════
+   Reduced motion — respect user preference
+═══════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ═══════════════════════════════════════
+   Custom scrollbar (subtle, violet tinted)
+═══════════════════════════════════════ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent-300);
+  border-radius: 100px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-400);
+}
+
+/* ═══════════════════════════════════════
+   Utility classes
+═══════════════════════════════════════ */
+.surface {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--bg-border);
+}
+
+.surface-raised {
+  background-color: var(--bg-raised);
+  border: 1px solid var(--bg-border);
+}
+
+.text-accent { color: var(--accent-600); }
+.text-muted  { color: var(--text-muted); }
+
+.card-hover {
+  transition: box-shadow var(--duration-base) var(--ease-smooth),
+              transform var(--duration-base) var(--ease-smooth),
+              border-color var(--duration-base) var(--ease-smooth);
+}
+.card-hover:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--accent-300);
+}
