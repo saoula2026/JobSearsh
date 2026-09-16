@@ -8,6 +8,7 @@ import { normalizeRemotive } from "./remotive";
 import { normalizeArbeitnow } from "./arbeitnow";
 import { normalizeRemoteok } from "./remoteok";
 import { normalizeJobicy } from "./jobicy";
+import { REGION_TO_COUNTRIES, COUNTRY_TO_CITIES } from "../locationMapping";
 
 export function dedupeListings(
   listings: ExternalJobListing[]
@@ -31,8 +32,12 @@ export function dedupeListings(
 }
 
 export async function fetchAllJobs(role: string, location: string): Promise<{ jobs: ExternalJobListing[], errors: string[] }> {
-  const roleQuery = role ? encodeURIComponent(role.toLowerCase()) : "";
-  const locationQuery = location ? encodeURIComponent(location.toLowerCase()) : "";
+  // Normalize spacing for queries
+  const roleClean = role ? role.trim().replace(/\s+/g, " ").toLowerCase() : "";
+  const locationClean = location ? location.trim().replace(/\s+/g, " ").toLowerCase() : "";
+
+  const roleQuery = roleClean ? encodeURIComponent(roleClean) : "";
+  const locationQuery = locationClean ? encodeURIComponent(locationClean) : "";
   
   const sources = [
     {
@@ -85,19 +90,53 @@ export async function fetchAllJobs(role: string, location: string): Promise<{ jo
           now
         );
         
-        // Always apply client-side filtering as a fallback since APIs are inconsistent
-        if (role) {
-          const roleLower = role.toLowerCase();
-          normalized = normalized.filter((j: ExternalJobListing) => 
-            j.role.toLowerCase().includes(roleLower) || 
-            j.company.toLowerCase().includes(roleLower) ||
-            j.tags.some((t: string) => t.toLowerCase().includes(roleLower))
-          );
+        // Client-side filtering
+        if (roleClean) {
+          const roleTokens = roleClean.split(" ");
+          // Strip punctuation for matching (e.g. Next.js -> Nextjs)
+          const stripPunctuation = (str: string) => str.replace(/[^\w\s]/g, "");
+          
+          normalized = normalized.filter((j: ExternalJobListing) => {
+            const rawSearchableText = `${j.role} ${j.company} ${j.tags.join(" ")}`.toLowerCase();
+            const cleanSearchableText = stripPunctuation(rawSearchableText);
+            
+            return roleTokens.every(token => {
+              const cleanToken = stripPunctuation(token);
+              // if token has punctuation (like "next.js"), try both exact raw search or stripped search
+              return rawSearchableText.includes(token) || (cleanToken && cleanSearchableText.includes(cleanToken));
+            });
+          });
         }
         
-        if (location && location.toLowerCase() !== "remote") {
-          const locLower = location.toLowerCase();
-          normalized = normalized.filter((j: ExternalJobListing) => j.location.toLowerCase().includes(locLower));
+        if (locationClean && locationClean !== "remote") {
+          // Build expansion list
+          const expandedLocations = [locationClean];
+          
+          // Region to countries
+          if (REGION_TO_COUNTRIES[locationClean]) {
+            expandedLocations.push(...REGION_TO_COUNTRIES[locationClean]);
+            // Also add all cities in those countries
+            REGION_TO_COUNTRIES[locationClean].forEach(country => {
+              if (COUNTRY_TO_CITIES[country]) expandedLocations.push(...COUNTRY_TO_CITIES[country]);
+            });
+          }
+          // Country to cities
+          else if (COUNTRY_TO_CITIES[locationClean]) {
+            expandedLocations.push(...COUNTRY_TO_CITIES[locationClean]);
+          }
+
+          normalized = normalized.filter((j: ExternalJobListing) => {
+            const listingLoc = j.location.toLowerCase();
+            // Match if any of the expanded location terms are a substring or word boundary match in the listing location
+            return expandedLocations.some(term => {
+              // Word boundary check for short terms like "us" or "uk"
+              if (term.length <= 2) {
+                const regex = new RegExp(`\\b${term}\\b`);
+                return regex.test(listingLoc);
+              }
+              return listingLoc.includes(term);
+            });
+          });
         }
 
         allJobs = allJobs.concat(normalized);

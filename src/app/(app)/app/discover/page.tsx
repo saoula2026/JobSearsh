@@ -56,14 +56,19 @@ function useCompanyBlurb(company: string, enabled: boolean) {
       // 2. Conservative heuristic
       const topResult = results[0];
       const titleLower = topResult.title.toLowerCase();
-      const companyLower = company.toLowerCase();
+      const companyLower = company.toLowerCase().trim();
       
       const isExactMatch = titleLower === companyLower;
-      const isCompanyVariant = titleLower.includes(companyLower) && 
+      // Job board says "Google Inc", Wiki says "Google" -> valid
+      const isJobBoardVariant = companyLower.includes(titleLower) && titleLower.length > 2;
+      // Wiki says "Apple (company)", Job board says "Apple" -> valid
+      const isWikiVariant = titleLower.includes(companyLower) && 
         (titleLower.includes("inc") || titleLower.includes("corp") || titleLower.includes("ltd") || titleLower.includes("company") || titleLower.includes("software"));
-      const hasBusinessSnippet = topResult.snippet.toLowerCase().includes("company") || topResult.snippet.toLowerCase().includes("corporation");
+      // Snippet mentions it's a company/business
+      const snippetLower = topResult.snippet.toLowerCase();
+      const hasBusinessSnippet = snippetLower.includes("company") || snippetLower.includes("corporation") || snippetLower.includes("business") || snippetLower.includes("startup") || snippetLower.includes("platform");
 
-      if (!isExactMatch && !isCompanyVariant && !hasBusinessSnippet) {
+      if (!isExactMatch && !isJobBoardVariant && !isWikiVariant && !hasBusinessSnippet) {
         return { blurb: null };
       }
 
@@ -102,6 +107,7 @@ function JobCard({
   isSaving: boolean;
 }) {
   const [blurbVisible, setBlurbVisible] = useState(false);
+  const [descExpanded, setDescExpanded] = useState(false);
   const blurbQuery = useCompanyBlurb(listing.company, blurbVisible);
 
   const safeSnippet = typeof window !== "undefined"
@@ -120,10 +126,10 @@ function JobCard({
         boxShadow: "var(--shadow-sm)",
       }}
     >
-      <div className="p-4 flex flex-col gap-2 relative">
-        <div className="flex items-center gap-3">
+      <div className="p-4 flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
           <CompanyLogo company={listing.company} size={40} />
-          <div className="flex-1 min-w-0 pr-8">
+          <div className="flex-1 min-w-0">
             <h3
               className="font-semibold text-lg leading-tight truncate"
               style={{ color: "var(--text-primary)", fontFamily: "var(--font-jakarta), sans-serif" }}
@@ -135,7 +141,7 @@ function JobCard({
             </p>
           </div>
         </div>
-        <div className="absolute top-4 right-4">
+        <div className="flex-shrink-0">
           <SourceFreshnessBadge source={listing.source} fetchedAt={listing.fetchedAt} />
         </div>
       </div>
@@ -158,35 +164,51 @@ function JobCard({
       </div>
 
       {listing.tags.length > 0 && (
-        <div className="px-4 pb-3 flex flex-wrap gap-1.5">
-          {listing.tags.slice(0, 3).map((tag) => (
+        <div className="px-4 pb-3 flex flex-wrap gap-1">
+          {listing.tags.slice(0, 4).map((tag) => (
             <span
               key={tag}
-              className="px-2 py-0.5 rounded-md text-xs font-medium"
+              className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider"
               style={{
-                backgroundColor: "var(--accent-50)",
-                color: "var(--accent-700)",
-                border: "1px solid var(--accent-100)",
+                backgroundColor: "var(--bg-base)",
+                color: "var(--text-muted)",
+                border: "1px solid var(--bg-border)",
               }}
             >
               {tag}
             </span>
           ))}
-          {listing.tags.length > 3 && (
+          {listing.tags.length > 4 && (
             <span
-              className="px-2 py-0.5 rounded-md text-xs font-medium"
-              style={{ backgroundColor: "var(--bg-raised)", color: "var(--text-muted)" }}
+              className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider"
+              style={{
+                backgroundColor: "var(--bg-base)",
+                color: "var(--text-muted)",
+                border: "1px solid var(--bg-border)",
+              }}
             >
-              +{listing.tags.length - 3} more
+              +{listing.tags.length - 4}
             </span>
           )}
         </div>
       )}
 
       {safeSnippet && (
-        <p className="px-4 pb-3 text-xs leading-relaxed line-clamp-3" style={{ color: "var(--text-muted)" }}>
-          {safeSnippet}
-        </p>
+        <div className="px-4 pb-3">
+          <div 
+            className={`text-xs leading-relaxed ${descExpanded ? "max-h-[30vh] overflow-y-auto" : "line-clamp-3"}`} 
+            style={{ color: "var(--text-muted)" }}
+          >
+            {safeSnippet}
+          </div>
+          <button
+            onClick={() => setDescExpanded(!descExpanded)}
+            className="mt-1 text-xs font-medium min-h-[44px] flex items-center"
+            style={{ color: "var(--accent-600)" }}
+          >
+            {descExpanded ? "Show less" : "Show more"}
+          </button>
+        </div>
       )}
 
       <div className="px-4 pb-3">

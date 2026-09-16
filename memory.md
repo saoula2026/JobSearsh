@@ -200,3 +200,7 @@ Since the application has ZERO backend, all security is strictly client-side:
 | 14 | Remove seed data, fix devtools in prod | ✅ Done |
 | 15 | New SaaS Landing Page & UX Polish | ✅ Done |
 
+12. **Job Card Layout**: SourceFreshnessBadge must NOT use absolute positioning that overlaps the title. Use flex layout in the header and expand via hover to avoid shifting card height.
+13. **Wikipedia Summary Heuristic**: Must allow variants where the job board company includes the Wikipedia title (e.g. Job board: "Google Inc", Wiki: "Google") and not just the reverse.
+14. **Search Client-Side Filtering**: Tokenize multi-word queries ("next js") so that *any* combination of those words found across the role, company, or tags triggers a match, ignoring punctuation.
+15. **Location Expansion**: Location strings must be broadened against `src/lib/locationMapping.ts` so searches like "Europe" or "Germany" expand to include all known European countries and German cities automatically.

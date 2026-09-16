@@ -1,4 +1,6 @@
-import { Clock } from "lucide-react";
+"use client";
+
+import { Clock, Info } from "lucide-react";
 
 interface SourceFreshnessBadgeProps {
   source: string;
@@ -33,19 +35,37 @@ export default function SourceFreshnessBadge({
   const relativeTime = formatRelativeTime(fetchedAt);
 
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${className}`}
-      style={{
-        backgroundColor: "var(--accent-50)",
-        color: "var(--accent-700)",
-        border: "1px solid var(--accent-200)",
-      }}
-      title={`Fetched from ${label} at ${new Date(fetchedAt).toLocaleString()}`}
-    >
-      <Clock className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
-      <span>Live from {label}</span>
-      <span style={{ color: "var(--text-muted)" }}>·</span>
-      <span style={{ color: "var(--text-muted)" }}>{relativeTime}</span>
-    </span>
+    <div className={`relative group inline-block ${className}`}>
+      <span
+        className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] sm:text-xs font-medium cursor-help"
+        style={{
+          backgroundColor: "var(--accent-50)",
+          color: "var(--accent-700)",
+          border: "1px solid var(--accent-200)",
+        }}
+      >
+        <Clock className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
+        <span className="whitespace-nowrap">{relativeTime}</span>
+      </span>
+
+      {/* Hover tooltip */}
+      <div 
+        className="absolute bottom-full right-0 mb-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity pointer-events-none z-10 w-max"
+      >
+        <div 
+          className="px-2.5 py-1.5 rounded-md text-xs font-medium shadow-lg"
+          style={{
+            backgroundColor: "var(--bg-surface)",
+            color: "var(--text-primary)",
+            border: "1px solid var(--bg-border)",
+          }}
+        >
+          <div className="flex items-center gap-1.5">
+            <Info className="w-3 h-3" style={{ color: "var(--accent-600)" }} />
+            <span>Live from {label}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
