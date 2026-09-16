@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Job Search Command Center
+
+A strictly local-first, zero-backend job search and application tracking tool. 
+
+**Job Search Command Center** is designed to let you discover remote roles across multiple global job boards and track your application pipeline visually, without ever creating an account or handing over your data to a server.
+
+## Features
+
+- **Live Job Discovery:** Instantly search live listings from **Remotive**, **RemoteOK**, **Arbeitnow**, and **Jobicy** all at once directly from your browser. 
+- **Visual Kanban Pipeline:** Manage your applications with a beautiful drag-and-drop board. Move jobs from "Saved" to "Applied" to "Interviewing" effortlessly.
+- **Strictly Local-First (Zero Backend):** Everything lives in your browser's IndexedDB. No backend servers, no tracking, no forced logins. Your data is yours.
+- **One-Click Pipeline Saves:** Found a job you like? Click "Save to Pipeline" and it instantly becomes a tracked card with the company name, role, and URL pre-filled.
+- **Dark Mode Support:** A sleek, fully responsive interface that resizes perfectly on mobile and respects your system's color scheme preferences.
+
+## Tech Stack
+
+- **Framework:** Next.js (App Router, exported as a purely static site)
+- **Styling:** Tailwind CSS, Framer Motion for smooth animations, Lucide React for icons
+- **State & Data:** Dexie (IndexedDB wrapper) for local persistence, Zustand for global state, TanStack React Query for fetching live APIs.
+- **Zero Backend:** There are absolutely no API routes, no server actions, and no secrets in this repository. 
 
 ## Getting Started
 
-First, run the development server:
+Because there are no backend dependencies or environment variables, running the app locally is incredibly easy:
 
 ```bash
+# 1. Install dependencies
+npm install
+
+# 2. Run the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Since the architecture is Zero Backend, you can deploy this completely for free as a Static Site on Vercel, Netlify, or GitHub Pages.
 
-## Learn More
+```bash
+# Build the static export
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+The output will be placed in the `out/` directory, ready to be hosted anywhere.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+*(Note: The Content-Security-Policy in `vercel.json` restricts API calls strictly to the 4 approved job boards and Wikipedia for company data, ensuring zero data exfiltration).*
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

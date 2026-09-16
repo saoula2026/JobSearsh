@@ -28,11 +28,11 @@ export const metadata: Metadata = {
     template: "%s | Job Search Command Center",
   },
   description:
-    "A local-first job search tool: track your applications through a visual Kanban pipeline and discover live openings with real salary data — all in one place. No account required.",
+    "A local-first job search tool: track your applications through a visual Kanban pipeline and discover live remote openings across multiple global boards. No account required.",
   openGraph: {
     title: "Job Search Command Center",
     description:
-      "Track job applications + discover live openings with salary benchmarks. Local-first, no account needed.",
+      "Track job applications + discover live remote openings from multiple boards. Local-first, no account needed.",
     type: "website",
   },
 };
